@@ -1,0 +1,8 @@
+pyttsx3
+SpeechRecognition
+PyAudio
+pyinstaller
+google-auth-oauthlib
+google-api-python-client
+pystray
+pillow

@@ -1,0 +1,117 @@
+JARVIS PC — leia antes de usar
+================================
+
+AGORA É UM APLICATIVO DE VERDADE:
+- Ele vive na bandeja do sistema (ícone azul perto do relógio, no canto
+  inferior direito da tela), sem janela de terminal aberta.
+- Clique com o botão direito no ícone para: pausar/retomar a escuta, abrir
+  o Second Brain, ou sair.
+- O instalador cria atalho no Menu Iniciar, na Área de Trabalho, e tem uma
+  opção para iniciar o Jarvis automaticamente junto com o Windows.
+
+O QUE ESTE PROGRAMA FAZ (e só isso):
+- Abre programas e sites de uma lista pré-definida (edite ALLOWED_APPS /
+  ALLOWED_SITES no topo do jarvis.py)
+- Toca/pausa música e ajusta volume (teclas de mídia do Windows)
+- Cria lembretes e timers falados
+- Organiza arquivos em subpastas por tipo, SOMENTE dentro da pasta WORK_FOLDER
+  (por padrão, sua pasta Downloads) — e sempre pede "sim" antes de mover algo
+- Faz contas e responde perguntas usando sua chave da API Anthropic
+- Guarda notas num arquivo local second_brain.json
+- Lê e-mails novos e responde dentro da mesma conversa (configuração abaixo)
+- Abre o WhatsApp Web com uma mensagem já escrita para o número que você disser
+  — ele NUNCA lê suas conversas e NUNCA envia sozinho: você sempre toca em
+  enviar. Isso é proposital: não existe um jeito oficial e seguro de um
+  programa ler ou responder WhatsApp, Instagram ou TikTok sozinho, então o
+  Jarvis só prepara a mensagem para você revisar e mandar.
+
+O QUE ELE NÃO FAZ, DE PROPÓSITO:
+- Não mexe em nada fora de WORK_FOLDER
+- Não lê e-mails, senhas, navegador logado, câmera ou histórico
+- Não instala programas nem roda comandos livres do sistema
+- Nunca apaga ou move arquivo sem confirmação por voz
+
+PASSO A PASSO (Windows)
+------------------------
+1) Instale o Python 3.11+ em https://python.org (marque "Add to PATH" na
+   instalação).
+2) Abra o Prompt de Comando nesta pasta e rode:
+     pip install -r requirements.txt
+   Se o PyAudio der erro ao instalar, rode antes:
+     pip install pipwin
+     pipwin install pyaudio
+3) Teste primeiro sem virar .exe:
+     python jarvis.py
+   Na primeira vez ele vai pedir sua chave da API Anthropic (console.anthropic.com)
+   e salvar em jarvis_key.txt, nesta mesma pasta — não compartilhe esse arquivo.
+4) Fale "Jarvis" seguido do pedido, por exemplo:
+     "Jarvis, abre a calculadora"
+     "Jarvis, me lembra em 10 minutos de beber água"
+     "Jarvis, organiza minha pasta"
+     "Jarvis, quanto é 15 vezes 7"
+     "Jarvis, manda mensagem para 96 99999-9999: cheguei"
+5) Para virar .exe, você tem duas opções:
+
+   OPÇÃO A — no seu próprio PC (precisa do Python instalado, passos 1-2 acima):
+     pyinstaller --onefile --noconsole jarvis.py
+   O arquivo final fica em dist\jarvis.exe.
+
+   OPÇÃO B — sem instalar nada, usando o GitHub (recomendado se você não quer
+   mexer com Python):
+     1. Crie uma conta gratuita em github.com
+     2. Crie um repositório novo (ex: "jarvis-pc") e suba TODOS os arquivos
+        desta pasta, incluindo a pasta oculta ".github" — pelo site mesmo,
+        em "Add file" > "Upload files", arrastando tudo.
+     3. Vá na aba "Actions" do repositório e clique em "Build Jarvis.exe" >
+        "Run workflow". Espere uns 4-7 minutos (agora ele também monta o
+        instalador, então demora um pouco mais).
+     4. Quando terminar, clique na execução concluída. Em "Artifacts" baixe
+        "JarvisInstalador" — é um instalador de verdade: execute-o, escolha
+        se quer iniciar com o Windows, e pronto. Se preferir só o .exe solto
+        (sem instalar nada), baixe "jarvis-exe-solto" em vez disso.
+   Importante: credentials.json, jarvis_key.txt e gmail_token.json guardam
+   dados privados seus — NÃO suba esses arquivos para o GitHub. Se o
+   repositório for público, qualquer um pode ver o que for enviado.
+
+GMAIL (ler e responder e-mails)
+--------------------------------
+O Jarvis só lê e-mails novos e responde DENTRO da mesma conversa — ele nunca
+escreve para alguém novo, nunca apaga e nunca encaminha nada. Antes de enviar
+qualquer resposta, ele fala o rascunho em voz alta e só envia se você disser
+"sim".
+
+Para ativar:
+1) Acesse https://console.cloud.google.com/ e entre com a conta Google cujo
+   e-mail o Jarvis vai usar.
+2) Crie um projeto novo (nome qualquer, ex: "Jarvis").
+3) No menu, vá em "APIs e serviços" > "Biblioteca", procure "Gmail API" e
+   clique em "Ativar".
+4) Vá em "APIs e serviços" > "Tela de consentimento OAuth": escolha "Externo",
+   preencha nome do app e seu e-mail, e em "Usuários de teste" adicione o
+   seu próprio e-mail do Gmail.
+5) Vá em "Credenciais" > "Criar credenciais" > "ID do cliente OAuth". Tipo de
+   aplicativo: "App para computador". Crie e clique em "Baixar JSON".
+6) Renomeie o arquivo baixado para credentials.json e coloque nesta mesma
+   pasta do jarvis.py.
+7) Rode "python jarvis.py" normalmente. Na primeira vez que você pedir
+   "Jarvis, veja meus e-mails", vai abrir uma janela do navegador pedindo
+   login e autorização — é normal, e só acontece uma vez.
+
+Comandos de voz:
+  "Jarvis, veja meus e-mails"
+  "Jarvis, responde que posso amanhã às 15h" (responde o último e-mail lido)
+
+PERSONALIZAR
+------------
+Abra jarvis.py em qualquer editor de texto e ajuste, no topo do arquivo:
+- WORK_FOLDER: a pasta que ele pode organizar
+- ALLOWED_APPS / ALLOWED_SITES: o que ele pode abrir
+Depois gere o .exe de novo com o comando do passo 5.
+
+SOBRE SEGURANÇA
+----------------
+Este programa roda no seu PC com as permissões do usuário do Windows que o
+executar — por isso ele foi desenhado para só tocar no que está nas listas
+permitidas, e para pedir confirmação antes de mover ou organizar arquivos.
+Se quiser mudar o que ele pode fazer, edite as listas acima em vez de pedir
+acesso irrestrito: isso mantém o risco baixo mesmo se algo sair errado.

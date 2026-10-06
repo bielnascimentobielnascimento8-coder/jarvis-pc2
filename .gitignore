@@ -1,0 +1,8 @@
+jarvis_key.txt
+credentials.json
+gmail_token.json
+second_brain.json
+dist/
+build/
+*.spec
+__pycache__/
