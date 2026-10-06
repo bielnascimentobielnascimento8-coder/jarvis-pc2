@@ -1,0 +1,45 @@
+name: Build Jarvis.exe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pipwin
+          pipwin install pyaudio
+
+      - name: Gerar jarvis.exe
+        run: pyinstaller --onefile --noconsole --name jarvis --icon icon.ico --add-data "icon.ico;." jarvis.py
+
+      - name: Instalar o Inno Setup
+        run: choco install innosetup -y
+
+      - name: Gerar o instalador (JarvisInstalador.exe)
+        run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss'
+
+      - name: Publicar o instalador (use este)
+        uses: actions/upload-artifact@v4
+        with:
+          name: JarvisInstalador
+          path: Output/JarvisInstalador.exe
+
+      - name: Publicar o executável solto (alternativa)
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-exe-sol
+          to
+          path: dist/jarvis.exe
